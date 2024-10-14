@@ -2,7 +2,8 @@
   "name": "network-lib",
   "version": "1.0.0",
   "description": "通用网络请求模块",
-  "main": "index.js",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "scripts": {
     "build": "tsc",
     "prepublishOnly": "npm run build"
