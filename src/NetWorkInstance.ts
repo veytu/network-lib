@@ -1,30 +1,19 @@
 import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
 
-// 定义请求接口
-interface Request {
-  url: string;
-  method?: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
-  data?: any;
-  params?: any;
-}
-
-// 定义响应接口
-export interface Response<T> {
-  code: number
-  data: T
-  msg: string
-}
+import { Request, Response, CustomConfig } from './type';
 
 class NetWork {
   private instance: AxiosInstance;
 
-  constructor(config?: AxiosRequestConfig) {
+  constructor(config: CustomConfig) {
     this.instance = axios.create(config);
-    this.interceptors();
+    this.interceptors(config);
+    //允许在实例化 PFRequest 时传入自定义的拦截器
   }
 
   // 拦截器
-  private interceptors() {
+  interceptors(config: CustomConfig) {
+    const { interceptors } = config;
     // 请求拦截器
     this.instance.interceptors.request.use(
       // @ts-ignore
@@ -52,6 +41,12 @@ class NetWork {
         return Promise.reject(error);
       }
     );
+
+    if (interceptors) {
+      this.instance.interceptors.request.use(interceptors.request);
+      this.instance.interceptors.response.use(interceptors.response);
+
+    }
   }
 
   // 通用发送请求的方法
@@ -64,6 +59,7 @@ class NetWork {
         params: config.params,
       })
         .then((response: AxiosResponse) => {
+          console.log("🚀 ~ NetWork ~ .then ~ response:", response)
           resolve({
             code: response.status,
             data: response.data,
@@ -77,20 +73,20 @@ class NetWork {
   }
 
   // 常用请求方法
-  get<T>(url: string, params?: object): Promise<T> {
-    return this.instance.request({ url, method: 'GET', params });
+  get<T>(url: string, params?: object): Promise<Response<T>> {
+    return this.request({ url, method: 'GET', params });
   }
 
-  post<T>(url: string, params?: object): Promise<T> {
-    return this.instance.request({ url, method: 'POST', params });
+  post<T>(url: string, params?: object): Promise<Response<T>> {
+    return this.request({ url, method: 'POST', params });
   }
 
-  put<T>(url: string, params?: object): Promise<T> {
-    return this.instance.request({ url, method: 'PUT', params });
+  put<T>(url: string, params?: object): Promise<Response<T>> {
+    return this.request({ url, method: 'PUT', params });
   }
 
-  delete<T>(url: string, params?: object): Promise<T> {
-    return this.instance.request({ url, method: 'DELETE', params });
+  delete<T>(url: string, params?: object): Promise<Response<T>> {
+    return this.request({ url, method: 'DELETE', params });
   }
 
 }

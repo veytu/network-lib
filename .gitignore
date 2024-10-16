@@ -1,3 +1,9 @@
 node_modules
 dist
+lib
+es
 *.tsbuildinfo
+.env
+.vscode/
+package-lock.json
+yarn.lock
